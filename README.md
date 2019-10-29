@@ -17,7 +17,7 @@ To acquire an identity token:
 
 ```go
     import (
-        "github.com/qvik/gcpidentity"
+        "github.com/qvik/go-gcp-identity"
         stdlog "log"
     )
 
@@ -38,7 +38,7 @@ To verify an identity token:
 
 ```go
     import (
-        "github.com/qvik/gcpidentity"
+        "github.com/qvik/go-gcp-identity"
         stdlog "log"
     )
 
