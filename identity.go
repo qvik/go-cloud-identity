@@ -71,8 +71,7 @@ func NewVerifier(ctx context.Context, aud string) (*IDTokenVerifier, error) {
 	}
 
 	var config = &oidc.Config{
-		SkipClientIDCheck: false,
-		ClientID:          aud,
+		ClientID: aud,
 	}
 
 	idTokenVerifier := &IDTokenVerifier{
