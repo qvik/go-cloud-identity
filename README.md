@@ -30,7 +30,7 @@ import (
 )
 
 aud := "https://myapp/myservice" // Free-form string
-identity, err := gcpidentity.FetchGoogleMetadataIDToken(aud, gcpidentity.DefaultAccount)
+identity, err := gcpidentity.FetchGoogleMetadataIDToken(aud, "")
 if err != nil {
     log.Fatalf("got error: %v", err)
     return
