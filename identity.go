@@ -65,7 +65,7 @@ func FetchGoogleMetadataIDToken(aud string, account string) (string, error) {
 // NewVerifier creates a new IDTokenVerifier that internally caches the
 // remote key set used for ID token verification.
 func NewVerifier(ctx context.Context, aud string) (*IDTokenVerifier, error) {
-	provider, err := oidc.NewProvider(ctx, "googleIssuerURL")
+	provider, err := oidc.NewProvider(ctx, googleIssuerURL)
 	if err != nil {
 		return nil, err
 	}
