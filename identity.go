@@ -2,6 +2,7 @@ package gcpidentity
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 
@@ -37,22 +38,21 @@ type IDTokenVerifier struct {
 // to use the default account, specify `gceidentity.DefaultAccount´.
 func FetchGoogleMetadataIDToken(aud string, account string) (string, error) {
 	if !metadata.OnGCE() {
-		return "", fmt.Errorf("not running on GCE or compatible environment")
+		return "", errors.New("not running on GCE or compatible environment")
 	}
 
 	if aud == "" {
-		return "", fmt.Errorf("must specify a value for the aud parameter")
+		return "", errors.New("must specify a value for the aud parameter")
 	}
 
 	v := url.Values{}
 	v.Set("audience", aud)
 
-	uri := fmt.Sprintf("instance/service-accounts/%v/identity?%v",
-		account, v.Encode())
+	uri := fmt.Sprintf("instance/service-accounts/%v/identity?%v", account, v.Encode())
 
 	response, err := metadata.Get(uri)
 	if err != nil {
-		return "", fmt.Errorf("failed to retrieve metadata: %v", err)
+		return "", err
 	}
 
 	return response, nil
@@ -78,11 +78,8 @@ func NewVerifier(ctx context.Context, aud string) *IDTokenVerifier {
 }
 
 // VerifyGoogleIDToken verifies an Google ID token.
-// The parameter token is the raw ID token string.
-func (v *IDTokenVerifier) VerifyGoogleIDToken(ctx context.Context,
-	token string) error {
-
-	_, err := v.oidcVerifier.Verify(ctx, token)
-
-	return err
+// The parameter token is the JWT string.
+// Return IDToken and nil error when verify succeeds.
+func (v *IDTokenVerifier) VerifyGoogleIDToken(ctx context.Context, token string) (*oidc.IDToken, error) {
+	return v.oidcVerifier.Verify(ctx, token)
 }
