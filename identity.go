@@ -14,9 +14,6 @@ const (
 	// DefaultAccount is the constant for the default service account
 	DefaultAccount = "default"
 
-	// Google's root certificates URL
-	googleRootCertURL = "https://www.googleapis.com/oauth2/v3/certs"
-
 	// Google's issuer (iss) URL
 	googleIssuerURL = "https://accounts.google.com"
 )
@@ -35,7 +32,7 @@ type IDTokenVerifier struct {
 // indicates the target audience (receiver) of the request that the
 // id token is used to authenticate to.
 // Parameter account should indicate the service account identifier to use;
-// to use the default account, specify `gceidentity.DefaultAccount´.
+// use empty string for default account
 func FetchGoogleMetadataIDToken(aud string, account string) (string, error) {
 	if !metadata.OnGCE() {
 		return "", errors.New("not running on GCE or compatible environment")
@@ -43,6 +40,10 @@ func FetchGoogleMetadataIDToken(aud string, account string) (string, error) {
 
 	if aud == "" {
 		return "", errors.New("must specify a value for the aud parameter")
+	}
+
+	if account == "" {
+		account = DefaultAccount
 	}
 
 	v := url.Values{}
@@ -63,18 +64,22 @@ func FetchGoogleMetadataIDToken(aud string, account string) (string, error) {
 
 // NewVerifier creates a new IDTokenVerifier that internally caches the
 // remote key set used for ID token verification.
-func NewVerifier(ctx context.Context, aud string) *IDTokenVerifier {
-	keySet := oidc.NewRemoteKeySet(ctx, googleRootCertURL)
+func NewVerifier(ctx context.Context, aud string) (*IDTokenVerifier, error) {
+	provider, err := oidc.NewProvider(ctx, "googleIssuerURL")
+	if err != nil {
+		return nil, err
+	}
 
 	var config = &oidc.Config{
 		SkipClientIDCheck: false,
 		ClientID:          aud,
 	}
-	oidcVerifier := oidc.NewVerifier(googleIssuerURL, keySet, config)
 
-	return &IDTokenVerifier{
-		oidcVerifier: oidcVerifier,
+	idTokenVerifier := &IDTokenVerifier{
+		oidcVerifier: provider.Verifier(config),
 	}
+
+	return idTokenVerifier, nil
 }
 
 // VerifyGoogleIDToken verifies an Google ID token.
