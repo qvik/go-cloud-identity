@@ -1,4 +1,4 @@
-module github.com/qvik/gcpidentity
+module github.com/qvik/go-gcp-identity
 
 go 1.12
 
