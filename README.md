@@ -1,6 +1,6 @@
 # Google Cloud Platform Identity Utility
 
-[![GoDoc](https://godoc.org/github.com/qvik/go-gcp-identity?status.svg)](https://godoc.org/github.com/qvik/go-gcp-identity)
+[![GoDoc](https://godoc.org/github.com/qvik/go-cloud-identity?status.svg)](https://godoc.org/github.com/qvik/go-cloud-identity)
 
 This library provides mechanisms for acquiring an identity token using Google's GCE metadata server and verifying it. It can be used eg. for facilitating authentication and authorization in service-to-service calls in Google Cloud Platform (GCP) environments.
 
@@ -25,12 +25,12 @@ To acquire an identity token:
 
 ```go
 import (
-    "github.com/qvik/go-gcp-identity"
+    "github.com/qvik/go-cloud-identity/google"
     "log"
 )
 
 aud := "https://myapp/myservice" // Free-form string
-identity, err := gcpidentity.FetchGoogleMetadataIDToken(aud, "")
+identity, err := google.FetchMetadataIDToken(aud, "")
 if err != nil {
     log.Fatalf("got error: %v", err)
     return
@@ -45,12 +45,14 @@ To verify an identity token:
 
 ```go
 import (
-    "github.com/qvik/go-gcp-identity"
+    "github.com/qvik/go-cloud-identity/google"
     "log"
+    "context"
 )
 
-verifier := gcpidentity.NewVerifier(ctx, aud)
-if _, err := verifier.VerifyGoogleIDToken(ctx, identity); err != nil {
+ctx := context.Background()
+verifier := google.NewVerifier(ctx, aud)
+if _, err := verifier.VerifyIDToken(ctx, identity); err != nil {
     log.Fatalf("failed to verify token: %v", err)
 }
 ```
@@ -58,6 +60,14 @@ if _, err := verifier.VerifyGoogleIDToken(ctx, identity); err != nil {
 ## License
 
 This library is released under the MIT license.
+
+## Contributing 
+
+Contributions to this library are welcomed. Any contributions have to meet the following criteria:
+
+* Meaningfulness. Discuss whether what you are about to contribute indeed belongs to this library in the first place before submitting a pull request.
+* Code style. Use gofmt and golint and you cannot go wrong with this. Generally do not exceed a line length of 80 characters.
+* Testing. Try and include tests for your code.
 
 ## Contact
 
