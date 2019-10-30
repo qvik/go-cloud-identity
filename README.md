@@ -14,7 +14,7 @@ The usual flow is:
 ## Installing the library dependency
 
 ```sh
-go get -u "github.com/qvik/go-gcp-identity"
+go get -u github.com/qvik/go-gcp-identity
 ```
 
 ## Acquiring an identity token
@@ -24,18 +24,17 @@ Retrieval of the identity token from a GCE metadata server is available for Goog
 To acquire an identity token:
 
 ```go
-    import (
-        "github.com/qvik/go-gcp-identity"
-        stdlog "log"
-    )
+import (
+    "github.com/qvik/go-gcp-identity"
+    "log"
+)
 
-	aud := "https://myapp/myservice" // Free-form string
-	identity, err := gcpidentity.FetchGoogleIDToken(aud,
-		gcpidentity.DefaultAccount)
-	if err != nil {
-		stdlog.Fatalf("got error: %v", err)
-		return
-	}
+aud := "https://myapp/myservice" // Free-form string
+identity, err := gcpidentity.FetchGoogleMetadataIDToken(aud, "")
+if err != nil {
+    log.Fatalf("got error: %v", err)
+    return
+}
 ```
 
 ## Verifying an identity token
@@ -45,15 +44,15 @@ Verification of the identity token is available on any platform. It is highly re
 To verify an identity token:
 
 ```go
-    import (
-        "github.com/qvik/go-gcp-identity"
-        stdlog "log"
-    )
+import (
+    "github.com/qvik/go-gcp-identity"
+    "log"
+)
 
-    verifier := gcpidentity.NewVerifier(ctx, aud)
-    if err := verifier.VerifyGoogleIDToken(ctx, identity); err != nil {
-		stdlog.Fatalf("failed to verify token: %v", err)
-	}
+verifier := gcpidentity.NewVerifier(ctx, aud)
+if _, err := verifier.VerifyGoogleIDToken(ctx, identity); err != nil {
+    log.Fatalf("failed to verify token: %v", err)
+}
 ```
 
 ## License
