@@ -1,8 +1,10 @@
-# Google Cloud Platform Identity Utility
+# Cloud Identity Utility
 
 [![GoDoc](https://godoc.org/github.com/qvik/go-cloud-identity?status.svg)](https://godoc.org/github.com/qvik/go-cloud-identity)
 
 This library provides mechanisms for acquiring an identity token using Google's GCE metadata server and verifying it. It can be used eg. for facilitating authentication and authorization in service-to-service calls in Google Cloud Platform (GCP) environments.
+
+AWS etc. support added when one is needed.
 
 The usual flow is:
 
@@ -14,7 +16,7 @@ The usual flow is:
 ## Installing the library dependency
 
 ```sh
-go get -u github.com/qvik/go-gcp-identity
+go get -u github.com/qvik/go-cloud-identity
 ```
 
 ## Acquiring an identity token
