@@ -2,7 +2,17 @@
 
 [![GoDoc](https://godoc.org/github.com/qvik/go-cloud-identity?status.svg)](https://godoc.org/github.com/qvik/go-cloud-identity)
 
-This library provides mechanisms for acquiring an identity token using Google's GCE metadata server and verifying it. It can be used eg. for facilitating authentication and authorization in service-to-service calls in Google Cloud Platform (GCP) environments.
+This library provides mechanisms for dealing with identities in a cloud environment.
+
+## Installing the library dependency
+
+```sh
+go get -u github.com/qvik/go-cloud-identity
+```
+
+## OpenID Connect ID Tokens for server-to-server authentication
+
+This library provides functionality for acquiring an identity token using Google's GCE metadata server and verifying it. It can be used eg. for facilitating authentication and authorization in service-to-service calls in Google Cloud Platform (GCP) environments.
 
 AWS etc. support added when one is needed.
 
@@ -13,13 +23,7 @@ The usual flow is:
 3. The called service extracts the token from the call
 4. The called service verifies the token against its expected AUD value.
 
-## Installing the library dependency
-
-```sh
-go get -u github.com/qvik/go-cloud-identity
-```
-
-## Acquiring an identity token
+### Acquiring an identity token
 
 Retrieval of the identity token from a GCE metadata server is available for Google Compute Engine, Google AppEngine standard second generation and flexible runtimes.
 
@@ -57,6 +61,25 @@ verifier := google.NewVerifier(ctx, aud)
 if _, err := verifier.VerifyIDToken(ctx, identity); err != nil {
     log.Fatalf("failed to verify token: %v", err)
 }
+```
+
+## Getting a signed Google Cloud Storage URL
+
+To get a signed GCS url:
+
+```go
+import (
+    "github.com/qvik/go-cloud-identity/google"
+    "cloud.google.com/go/compute/metadata"
+)
+
+saEmail, _ := metadata.Email(google.DefaultAccount)
+name := "path/to/my/file"
+signBytes := func(payload []byte) ([]byte, error) {
+  return google.SignBytes(payload, "", saEmail)
+}
+signedURL, _ := google.GetSignedURL("bucket1", name, saEmail, "GET",
+  time.Minute*60, signBytes)
 ```
 
 ## License
