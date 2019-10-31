@@ -20,12 +20,13 @@ import (
 //  signBytes := func(payload []byte) ([]byte, error) {
 //    return google.SignBytes(payload, "", saEmail)
 //  }
+//	expires := time.Now().Add(time.Minute * 60)
 //  signedURL, _ := google.GetSignedURL("bucket1", name, saEmail, "GET",
-//    time.Minute*60, signBytes)
+//    expires, signBytes)
 //
 // This method does network I/O and could introduce latency.
 func GetSignedURL(bucket, name, serviceAccountEmail, method string,
-	expires time.Duration,
+	expires time.Time,
 	signBytes func(payload []byte) ([]byte, error)) (string, error) {
 
 	opts := &storage.SignedURLOptions{
@@ -33,7 +34,7 @@ func GetSignedURL(bucket, name, serviceAccountEmail, method string,
 		Scheme:         storage.SigningSchemeV4,
 		SignBytes:      signBytes,
 		Method:         method,
-		Expires:        time.Now().Add(expires),
+		Expires:        expires,
 	}
 
 	return storage.SignedURL(bucket, name, opts)

@@ -78,8 +78,9 @@ name := "path/to/my/file"
 signBytes := func(payload []byte) ([]byte, error) {
   return google.SignBytes(payload, "", saEmail)
 }
+expires := time.Now().Add(time.Minute * 60)
 signedURL, _ := google.GetSignedURL("bucket1", name, saEmail, "GET",
-  time.Minute*60, signBytes)
+   expires, signBytes)
 ```
 
 ## License
