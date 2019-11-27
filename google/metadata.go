@@ -15,7 +15,7 @@ import (
 // indicates the target audience (receiver) of the request that the
 // id token is used to authenticate to.
 // Parameter account should indicate the service account identifier to use;
-// use empty string for default account
+// use empty string or google.DefaultAccount for default account.
 func FetchMetadataIDToken(aud string, account string) (string, error) {
 	if !metadata.OnGCE() {
 		return "", errors.New("not running on GCE or compatible environment")

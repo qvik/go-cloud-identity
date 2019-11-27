@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	stdlog "log"
 
 	"github.com/pkg/errors"
 
@@ -44,8 +43,6 @@ func SignBytes(payload []byte, projectID,
 	req := &iamcredentials.SignBlobRequest{
 		Payload: encoded,
 	}
-
-	stdlog.Printf("name=%v", name)
 
 	res, err := accountsService.SignBlob(name, req).Do()
 	if err != nil {
