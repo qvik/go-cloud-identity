@@ -18,41 +18,29 @@ import (
 // You may specify "-" or empty string ("") for the projectID parameter
 // to use the current project's ID.
 // This method does network I/O and could introduce latency.
-func SignBytes(payload []byte, projectID,
-	serviceAccount string) ([]byte, error) {
-
+func SignBytes(bytes []byte, serviceAccount string) (string, error) {
 	ctx := context.Background()
 	client, err := google.DefaultClient(ctx, iam.CloudPlatformScope)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create default Google client")
+		return "", errors.Wrap(err, "failed to create default Google client")
 	}
 
 	credService, err := iamcredentials.New(client)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create IAM credentials service")
+		return "", errors.Wrap(err, "failed to create IAM credentials service")
 	}
 	accountsService := iamcredentials.NewProjectsServiceAccountsService(credService)
 
-	if projectID == "" {
-		projectID = "-"
-	}
-
-	name := fmt.Sprintf("projects/%v/serviceAccounts/%v",
-		projectID, serviceAccount)
-	encoded := base64.StdEncoding.EncodeToString(payload)
+	name := fmt.Sprintf("projects/-/serviceAccounts/%v", serviceAccount)
+	encoded := base64.StdEncoding.EncodeToString(bytes)
 	req := &iamcredentials.SignBlobRequest{
 		Payload: encoded,
 	}
 
 	res, err := accountsService.SignBlob(name, req).Do()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to sign bytes")
+		return "", errors.Wrap(err, "failed to sign bytes")
 	}
 
-	signedBytes, err := base64.StdEncoding.DecodeString(res.SignedBlob)
-	if err != nil {
-		return nil, errors.Wrap(err, "base64 decoding failed")
-	}
-
-	return signedBytes, nil
+	return res.SignedBlob, nil
 }
