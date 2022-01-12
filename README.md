@@ -18,7 +18,7 @@ AWS etc. support added when one is needed.
 
 The usual flow is:
 
-1. The calling service creates and ID token with specified AUD value to match the service to be called. 
+1. The calling service creates and ID token with specified AUD value to match the service to be called.
 2. The calling service incorporates this token in the method call -- typically, in a HTTP request, in an `Authorization: Bearer` header
 3. The called service extracts the token from the call
 4. The called service verifies the token against its expected AUD value.
@@ -69,14 +69,26 @@ To get a signed GCS url:
 
 ```go
 import (
-    "github.com/qvik/go-cloud-identity/google"
+    googleidentity "github.com/qvik/go-cloud-identity/google"
     "cloud.google.com/go/compute/metadata"
+    "github.com/pkg/errors"
+    "encoding/base64"
 )
 
 saEmail, _ := metadata.Email(google.DefaultAccount)
 name := "path/to/my/file"
 signBytes := func(payload []byte) ([]byte, error) {
-  return google.SignBytes(payload, "", saEmail)
+		signature, _, err := googleidentity.SignBytes(payload, saEmail)
+		if err != nil {
+			return nil, err
+		}
+
+		signatureBytes, err := base64.StdEncoding.DecodeString(signature)
+		if err != nil {
+			return nil, errors.Wrap(err, "base64 decoding failed")
+		}
+
+		return signatureBytes, nil
 }
 expires := time.Now().Add(time.Minute * 60)
 signedURL, _ := google.GetSignedURL("bucket1", name, saEmail, "GET",
@@ -87,13 +99,13 @@ signedURL, _ := google.GetSignedURL("bucket1", name, saEmail, "GET",
 
 This library is released under the MIT license.
 
-## Contributing 
+## Contributing
 
 Contributions to this library are welcomed. Any contributions have to meet the following criteria:
 
-* Meaningfulness. Discuss whether what you are about to contribute indeed belongs to this library in the first place before submitting a pull request.
-* Code style. Use gofmt and golint and you cannot go wrong with this. Generally do not exceed a line length of 80 characters.
-* Testing. Try and include tests for your code.
+- Meaningfulness. Discuss whether what you are about to contribute indeed belongs to this library in the first place before submitting a pull request.
+- Code style. Use gofmt and golint and you cannot go wrong with this. Generally do not exceed a line length of 80 characters.
+- Testing. Try and include tests for your code.
 
 ## Contact
 

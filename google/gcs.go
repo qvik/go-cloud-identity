@@ -13,17 +13,6 @@ import (
 // service account used for signing the URL - you could use
 // `metadata.Email()` to retrieve this value for a service account.
 // The signBytes parameter is a function that takes care of the signing.
-// One way to implement it is using this library:
-//
-//  saEmail, _ := metadata.Email(google.DefaultAccount)
-//  name := "path/to/my/file"
-//  signBytes := func(payload []byte) ([]byte, error) {
-//    return google.SignBytes(payload, "", saEmail)
-//  }
-//	expires := time.Now().Add(time.Minute * 60)
-//  signedURL, _ := google.GetSignedURL("bucket1", name, saEmail, "GET",
-//    expires, signBytes)
-//
 // This method does network I/O and could introduce latency.
 func GetSignedURL(bucket, name, serviceAccountEmail, method string,
 	expires time.Time,
