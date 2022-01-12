@@ -18,16 +18,19 @@ import (
 // You may specify "-" or empty string ("") for the projectID parameter
 // to use the current project's ID.
 // This method does network I/O and could introduce latency.
-func SignBytes(bytes []byte, serviceAccount string) (string, error) {
+// Returns the signature string and the Key ID used to sign.
+// For further info about how to verify the signature, see:
+// https://cloud.google.com/iam/docs/reference/credentials/rest/v1/projects.serviceAccounts/signBlob
+func SignBytes(bytes []byte, serviceAccount string) (string, string, error) {
 	ctx := context.Background()
 	client, err := google.DefaultClient(ctx, iam.CloudPlatformScope)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create default Google client")
+		return "", "", errors.Wrap(err, "failed to create default Google client")
 	}
 
 	credService, err := iamcredentials.New(client)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create IAM credentials service")
+		return "", "", errors.Wrap(err, "failed to create IAM credentials service")
 	}
 	accountsService := iamcredentials.NewProjectsServiceAccountsService(credService)
 
@@ -39,8 +42,8 @@ func SignBytes(bytes []byte, serviceAccount string) (string, error) {
 
 	res, err := accountsService.SignBlob(name, req).Do()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to sign bytes")
+		return "", "", errors.Wrap(err, "failed to sign bytes")
 	}
 
-	return res.SignedBlob, nil
+	return res.SignedBlob, res.KeyId, nil
 }
