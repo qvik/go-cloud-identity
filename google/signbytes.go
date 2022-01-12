@@ -15,10 +15,11 @@ import (
 // SignBytes signs the given bytes using the given service account.
 // Specify `google.DefaultAccount` as serviceAccount parameter to use the
 // default account.
-// You may specify "-" or empty string ("") for the projectID parameter
-// to use the current project's ID.
+//
 // This method does network I/O and could introduce latency.
-// Returns the signature string and the Key ID used to sign.
+//
+// Returns the signature string (base64 encoded) and the Key ID used to sign.
+//
 // For further info about how to verify the signature, see:
 // https://cloud.google.com/iam/docs/reference/credentials/rest/v1/projects.serviceAccounts/signBlob
 func SignBytes(bytes []byte, serviceAccount string) (string, string, error) {
